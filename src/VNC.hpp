@@ -295,7 +295,6 @@ public:
 				recvUpdateRectRAW(rectHeader);
 				break;
 			case RectHeader::EncodingType::COPYRECT:
-				// std::cout << "Received UpdateRect message of encoding type COPYRECT\n";
 				recvUpdateRectCOPYRECT(rectHeader);
 				break;
 			case RectHeader::EncodingType::RRE:
@@ -686,11 +685,8 @@ public:
 				const size_t width  = std::min<size_t>(rectHeader.width  - tileX * TILE_SIZE, TILE_SIZE);
 				const size_t height = std::min<size_t>(rectHeader.height - tileY * TILE_SIZE, TILE_SIZE);
 
-				// std::cout << "Tile <" << tileX << ", " << tileY << "> enc: " << (int)subEncoding << "  Size: " << (int)width << " * " << (int)height << "\n";
-
 				switch(subEncoding) {
 				case 0: { // raw
-					// std::cout << " - Raw\n";
 					for(size_t localY = 0; localY < height; localY++) {
 						for(size_t localX = 0; localX < width; localX++) {
 							const size_t absX = rectHeader.pos_x + tileX * TILE_SIZE + localX;
