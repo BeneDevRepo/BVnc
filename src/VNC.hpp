@@ -29,6 +29,14 @@
 // 3 -> ServerCutText
 
 
+/**
+ * Partial implementation of RFB Protocol (https://datatracker.ietf.org/doc/html/rfc6143)
+ * Tested Features:
+ *  - 32-bit padded 24-bit color
+ *  - Authentications: NONE and VNC
+ *  - Encodings: RAW, COPYRECT, ZRLE
+ *  - Pseudoencodings: Cursor Pseudoencoding (without saving cursor data; just to save bandwidth)
+*/
 class VNC {
 private:
 	struct PixelFormat {
@@ -98,16 +106,22 @@ public:
 		std::unordered_set<uint8_t> securityTypes;
 		for(size_t i = 0; i < numSecurityTypes; i++)
 			securityTypes.insert(sock.recvU8());
-		// sock.recvExactly(securityTypes.data(), numSecurityTypes);
+
 		for(const uint8_t& securityType : securityTypes)
 			std::cout << " - SecurityType <" << static_cast<int>(securityType) << "> received\n";
-		
-		if(securityTypes.contains(1)) { // None (no authentication required)
+
+		if(securityTypes.find(1) != securityTypes.end()) { // None (no authentication required)
 			std::cout << "Authentication: None\n";
 
 			sock.sendU8(1); // send security type 1 (None)
-		} else if(securityTypes.contains(2)) { // VNC Authentication (DES challenge)
+		} else if(securityTypes.find(2) != securityTypes.end()) { // VNC Authentication (DES challenge)
 			std::cout << "Authentication: VNC\n";
+
+			// Ask for Password:
+			std::string password;
+			std::cout << "Please input Password: ";
+			std::cin >> password;
+			std::cout << "You chose: \"" << password << "\"\n";
 
 			sock.sendU8(2); // send security type 2 (VNC authentication)
 
@@ -115,7 +129,7 @@ public:
 			std::array<uint8_t, 16> vncChallenge;
 			sock.recvExactly(vncChallenge.data(), 16); // receive random 16-byte vnc-auth challenge
 
-			std::array<uint8_t, 16> vncChallengeEncrypted = desEncrypt(vncChallenge, "#Benedik"); // Encrypt vnc-auth challenge
+			std::array<uint8_t, 16> vncChallengeEncrypted = desEncrypt(vncChallenge, password); // Encrypt vnc-auth challenge
 			sock.send(vncChallengeEncrypted.data(), 16); // reply to vnc-auth challenge
 			std::cout << "Sent encrypted challenge back to server...\n";
 		}

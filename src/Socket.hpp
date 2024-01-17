@@ -4,15 +4,19 @@
 #include <stdexcept>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
 
+/**
+ * Simple Winsock2 Socket abstraction; probably not completely thread safe (Especially socket creation)
+*/
 class Socket {
 private:
-	static WSADATA wsaData;
-	static bool winSockInitialized;
+	static thread_local WSADATA wsaData;
+	static thread_local bool winSockInitialized;
 
 private:
 	SOCKET sock;
@@ -148,5 +152,5 @@ public:
 	}
 };
 
-WSADATA Socket::wsaData = {0};
-bool Socket::winSockInitialized = false;
+thread_local WSADATA Socket::wsaData = {0};
+thread_local bool Socket::winSockInitialized = false;

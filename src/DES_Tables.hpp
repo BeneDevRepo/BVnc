@@ -1,6 +1,8 @@
 #pragma once
 
 
+// original version: https://www.educative.io/answers/how-to-implement-the-des-algorithm-in-cpp
+
 #include <cstdint>
 
 

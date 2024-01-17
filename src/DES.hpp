@@ -1,7 +1,7 @@
 #pragma once
 
 
-// stolen from: https://www.educative.io/answers/how-to-implement-the-des-algorithm-in-cpp
+// original version: https://www.educative.io/answers/how-to-implement-the-des-algorithm-in-cpp
 
 #include <iostream>
 #include <string>
@@ -160,10 +160,10 @@ inline std::array<uint8_t, 16> desEncrypt(const std::array<uint8_t, 16> input, c
 			const uint8_t bit = (1 << ind);
 			return byte & bit;
 		};
-	
-	const auto toStr = []<size_t N>(const std::array<bool, N>& data) -> std::string {
+
+	const auto toStr = [](const auto& data) -> std::string { // toStr(const std::array<bool, N>& data)
 			std::string out;
-			for(size_t i = 0; i < N; i++)
+			for(size_t i = 0; i < data.size(); i++)
 				out += '0' + !!data[i];
 			return out + " len: " + std::to_string(data.size());
 		};
